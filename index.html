@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Materias optativas | FCNyM - UNLP (prototipo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bordo:#9a311e; --grado:#314766; --naranja:#b85621;
+  --texto:#1f2733; --suave:#55606e; --fondo:#f6f4f1; --linea:#e2e5ea; --hover:#eef1f6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--texto);font-family:Montserrat,"Helvetica Neue",Helvetica,sans-serif}
+a{color:var(--grado);font-weight:600}a:hover{color:var(--bordo)}
+:focus-visible{outline:3px solid var(--naranja);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+header{background:var(--bordo);padding:14px 0}
+header img{height:48px;width:auto;display:block}
+
+.hero{background:var(--grado);color:#fff;padding:40px 0 48px}
+.hero nav{font-size:13px;color:#dfe5ee;margin-bottom:12px}
+.hero h1{margin:0 0 12px;font-size:clamp(30px,5vw,40px);font-weight:800;line-height:1.1}
+.hero p{margin:0;font-size:17px;line-height:1.5;max-width:640px;color:#eef1f6}
+
+main{padding:32px 0 56px;display:flex;flex-direction:column;gap:36px}
+h2{margin:0;font-size:20px;font-weight:700}
+.sub{margin:4px 0 0;font-size:14px;color:var(--suave)}
+
+.carreras{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.carr{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px 16px;min-height:84px;border-radius:12px;font-family:inherit;text-align:left;cursor:pointer;background:#fff;color:var(--texto);border:2px solid var(--linea)}
+.carr:hover{border-color:var(--grado)}
+.carr[aria-pressed="true"]{background:var(--grado);color:#fff;border-color:var(--grado)}
+.carr .pre,.carr .cnt{font-size:12px;opacity:.85}
+.carr .pre{font-weight:500}.carr .cnt{font-weight:600}
+.carr .lab{font-size:16px;font-weight:700}
+
+.listhead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+.buscar{display:flex;flex-direction:column;gap:4px;flex:1 1 240px;max-width:340px}
+.buscar label{font-size:13px;font-weight:600}
+.buscar input{font-family:inherit;font-size:15px;padding:11px 14px;border:1px solid #b9c1cc;border-radius:8px;background:#fff;color:var(--texto)}
+
+.lista{display:flex;flex-direction:column;gap:8px}
+.mat{background:#fff;border:1px solid var(--linea);border-radius:12px;overflow:hidden}
+.mat-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;min-height:56px;background:transparent;border:0;text-align:left;font-family:inherit;color:var(--texto);cursor:pointer}
+.mat-btn:hover{background:var(--hover)}
+.mat-name{display:block;font-size:16px;font-weight:700}
+.mat-otras{display:block;font-size:12.5px;color:var(--suave);margin-top:4px}
+.mat-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.tag3d{font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--naranja);padding:4px 8px;border-radius:999px}
+.chev{transition:transform .2s}
+.mat-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+
+.panel{border-top:1px solid var(--linea);padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.panel[hidden]{display:none}
+.info{display:flex;flex-direction:column;gap:12px}
+.info p{margin:0;font-size:15px;line-height:1.6}
+.ejemplo{font-size:12px;color:#8a4f2a}
+.pend{color:var(--suave)}
+.datos{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
+.datos span{background:var(--hover);padding:6px 10px;border-radius:6px}
+.media{display:flex;flex-direction:column;gap:6px}
+.media small{font-size:12.5px;color:var(--suave)}
+.video{aspect-ratio:16/9;background:#1c2533;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.play{width:64px;height:64px;border-radius:50%;border:0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.obj3d{aspect-ratio:16/9;background:#f3ece6;border-radius:10px;display:flex;align-items:center;justify-content:center;perspective:600px;cursor:grab;touch-action:none;user-select:none}
+.obj3d:active{cursor:grabbing}
+.cube{position:relative;width:84px;height:84px;transform-style:preserve-3d;transform:rotateX(-22deg) rotateY(0deg)}
+.cube div{position:absolute;inset:0;border:2px solid var(--naranja);background:rgba(184,86,33,.10)}
+.vacio{background:#fff;border:1px dashed #b9c1cc;border-radius:12px;padding:24px;font-size:15px;line-height:1.5;color:var(--suave)}
+
+details{background:#fff;border:1px solid var(--linea);border-radius:12px;padding:16px 20px}
+summary{cursor:pointer;font-size:16px;font-weight:700}
+details p{margin:12px 0 0;font-size:15px;line-height:1.6}
+.tramites{display:flex;flex-direction:column;gap:10px}
+
+footer{background:var(--texto);color:#dfe5ee;padding:28px 0;font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 32px}
+footer strong{color:#fff}
+@media (prefers-reduced-motion:reduce){.chev{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><img src="logo.png" alt="Facultad de Ciencias Naturales y Museo, Universidad Nacional de La Plata"></div></header>
+
+<section class="hero"><div class="wrap">
+  <nav aria-label="Ruta">Grado › Carreras › Materias optativas</nav>
+  <h1>Materias optativas</h1>
+  <p>Elegí tu carrera y explorá las optativas que podés cursar: de qué tratan, un video de la cátedra y, en algunas, piezas del Museo en 3D.</p>
+</div></section>
+
+<main class="wrap">
+  <section>
+    <h2>1. Elegí tu carrera</h2>
+    <div class="carreras" id="carreras"></div>
+  </section>
+
+  <section>
+    <div class="listhead">
+      <div>
+        <h2 id="titulo-lista">2. Optativas</h2>
+        <p class="sub" id="resultado"></p>
+      </div>
+      <div class="buscar">
+        <label for="buscar">Buscar materia</label>
+        <input id="buscar" type="search" placeholder="Ej: Herpetología" autocomplete="off">
+      </div>
+    </div>
+    <div class="lista" id="lista" aria-live="polite"></div>
+  </section>
+
+  <section class="tramites">
+    <h2>Antes de inscribirte</h2>
+    <details>
+      <summary>¿Qué necesito para cursar optativas?</summary>
+      <p>Tener cursadas todas las materias de primer y segundo año al comienzo del ciclo lectivo. Podés adeudar solo una de tercer año, que tendrás que cursar en simultáneo con la optativa. Podés presentar la solicitud igual: se autoriza cuando cumplas el requisito (Reglamento General de Planes de Estudio, Art. 7).</p>
+    </details>
+    <details>
+      <summary>Quiero cursar una materia que no está en el listado</summary>
+      <p>Presentá una carta al Decanato por Mesa de Entradas, con el programa certificado por la unidad académica de origen (contenidos, carga horaria, evaluación y vigencia) y el aval de tu docente asesor/a. <a href="#">Ver modelo de carta</a></p>
+    </details>
+    <details>
+      <summary>Quiero cambiar una optativa que ya cursé</summary>
+      <p>Podés pedir la baja de una optativa cursada para tomar otra, con una nota al Decanato que incluya una justificación académica y el aval de tu docente asesor/a. Pasa por el Consejo Consultivo Departamental, la Comisión Asesora de Enseñanza y el Consejo Directivo: presentala con tiempo. <a href="#">Ver modelo de nota</a></p>
+    </details>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <strong>Facultad de Ciencias Naturales y Museo, UNLP</strong>
+  <span>Av. 122 y 60, La Plata</span>
+  <span>+54 (221) 427 5782</span>
+  <span>fcnym@fcnym.unlp.edu.ar</span>
+</div></footer>
+
+<script>
+// ===== DATOS =====
+// Cada materia: [nombre, carreras donde es optativa]
+// A Antropología, B Botánica, E Ecología, P Paleontología, Z Zoología, G Geología
+const MATERIAS = [["Anatomía Comparada","A"],["Antropología Biológica II","PZ"],["Antropología e Imagen","A"],["Antropología General","EP"],["Arqueología de la Alimentación en América del Sur","AE"],["Arqueologías del Paisaje","A"],["Arqueología Histórica","A"],["Arte, Tecnología y Antropología","A"],["Artrópodos de Interés Médico y Veterinario","EZ"],["Aspectos teóricos y metodológicos del estudio del comportamiento","Z"],["Biogeografía","AZ"],["Botánica Aplicada","AE"],["Botánica Sistemática I","PZ"],["Botánica Sistemática II","AZ"],["Citología","BEZ"],["Control Biológico","BEZ"],["Debates actuales en torno al estudio del Patrimonio Cultural","A"],["Dinámica de Nutrientes en Ecosistemas Acuáticos","BEZ"],["Ecofisiología de hongos y microorganismos morfológicos afines","B"],["Ecología de Comunidades y Sistemas","ABZ"],["Ecología de Pastizales y Sistemas Agrícolas","BEZ"],["Ecología de Plagas","BEZ"],["Ecología de Poblaciones","BPZ"],["Ecología General","A"],["Ecología y Manejo de Bosques Nativos","BE"],["Entomología","EZ"],["Etnografía I","B"],["Estratigrafía del Cuaternario","PG"],["Etnohistoria","A"],["Estudios comparados del comportamiento","Z"],["Evolución","ABEZ"],["Ficología","BE"],["Fisiología Animal","A"],["Fisiología Vegetal","Z"],["Fitogeografía","BPZ"],["Fundamentos de Paleontología","Z"],["Genética","AP"],["Geoestadística","G"],["Geofísica","G"],["Geología Ambiental","BEZG"],["Geología Argentina","P"],["Geología del Cuaternario","Z"],["Geología de Minas","G"],["Geología del Subsuelo","G"],["Geología Isotópica","G"],["Geomática","G"],["Geoquímica Avanzada","G"],["Geotectónica","G"],["Herpetología","EPZ"],["Herramientas para el abordaje del quehacer extensionista","BEZG"],["Hidrología General","G"],["Histología y Embriología Animal","ABP"],["Ictiología","PZ"],["Introducción a la Taxonomía","A"],["Legislación de los Recursos Naturales Renovables","ABEZ"],["Levantamiento Arqueológico","A"],["Levantamiento Geológico","A"],["Limnología","BE"],["Lógica y Metodología de la Ciencia","BZ"],["Malacología","EPZ"],["Mastozoología","EPZ"],["Métodos y técnicas en la investigación arqueológica","A"],["Métodos y técnicas en la investigación sociocultural","A"],["Métodos y técnicas en la investigación antropobiológica","A"],["Micología","BEZ"],["Micromorfología de Suelos","AG"],["Micropaleontología","BZG"],["Mineralogía","Z"],["Mineralogía Especial","G"],["Morfología Vegetal","AZ"],["Orientaciones en la Teoría Antropológica","Z"],["Ornitología","EPZ"],["Paleobotánica","EZ"],["Paleoecología","A"],["Paleontología de Invertebrados","Z"],["Paleontología de Vertebrados","AZ"],["Palinología","BEPZG"],["Parasitología General","EZ"],["Patología de Insectos","BEZ"],["Pedología General","BEZ"],["Petrología Especial","G"]];
+
+const CARRERAS = [
+  {id:"A",pre:"Lic. en",label:"Antropología"},
+  {id:"B",pre:"Biología or.",label:"Botánica"},
+  {id:"E",pre:"Biología or.",label:"Ecología"},
+  {id:"P",pre:"Biología or.",label:"Paleontología"},
+  {id:"Z",pre:"Biología or.",label:"Zoología"},
+  {id:"G",pre:"Lic. en",label:"Geología"},
+  {id:"Q",pre:"Lic. en",label:"Geoquímica"}
+];
+
+// Descripciones de ejemplo (a validar por cada cátedra)
+const DESCRIPCIONES = {
+  "Herpetología":"Biología, diversidad y sistemática de anfibios y reptiles.",
+  "Ornitología":"Biología, diversidad y sistemática de las aves.",
+  "Mastozoología":"Biología, diversidad y sistemática de los mamíferos.",
+  "Malacología":"Estudio de los moluscos: morfología, diversidad y ecología.",
+  "Ictiología":"Estudio de los peces: anatomía, diversidad y ecología.",
+  "Entomología":"Estudio de los insectos: morfología, clasificación y biología.",
+  "Paleontología de Vertebrados":"Registro fósil y evolución de los vertebrados.",
+  "Palinología":"Estudio del polen y las esporas, actuales y fósiles.",
+  "Mineralogía":"Estudio de los minerales: estructura, propiedades e identificación.",
+  "Micropaleontología":"Estudio de los microfósiles y su uso para fechar y correlacionar rocas."
+};
+
+// Materias que muestran objeto 3D en el prototipo
+const CON_3D = ["Herpetología","Malacología","Mastozoología","Paleontología de Vertebrados","Mineralogía","Micropaleontología"];
+
+// ===== LÓGICA =====
+const nombre = Object.fromEntries(CARRERAS.map(c => [c.id, c.label]));
+let sel = "Z", abierta = null, q = "";
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+
+function pintarCarreras(){
+  $("carreras").innerHTML = CARRERAS.map(c => {
+    const n = c.id === "Q" ? 0 : MATERIAS.filter(m => m[1].includes(c.id)).length;
+    const cnt = c.id === "Q" ? "Listado a cargar" : n + " optativas";
+    return `<button class="carr" data-id="${c.id}" aria-pressed="${c.id === sel}">
+      <span class="pre">${c.pre}</span><span class="lab">${c.label}</span><span class="cnt">${cnt}</span></button>`;
+  }).join("");
+}
+
+function pintarLista(){
+  $("titulo-lista").textContent = "2. Optativas de " + nombre[sel];
+  if (sel === "Q") {
+    $("resultado").textContent = "Sin datos en la tabla general";
+    $("lista").innerHTML = `<div class="vacio">[Listado de optativas de Geoquímica: a cargar desde su archivo de optativas autorizadas. No figura en la tabla general.]</div>`;
+    return;
+  }
+  const filtro = q.trim().toLowerCase();
+  const items = MATERIAS.filter(m => m[1].includes(sel) && (!filtro || m[0].toLowerCase().includes(filtro)));
+  $("resultado").textContent = items.length + " materias. Tocá una para ver su descripción, video y 3D.";
+  if (!items.length) {
+    $("lista").innerHTML = `<div class="vacio">No hay optativas con ese nombre en esta carrera. Probá con otra palabra o elegí otra carrera.</div>`;
+    return;
+  }
+  let html = items.map((m, i) => {
+    const [n, cs] = m;
+    const otras = cs.split("").filter(x => x !== sel).map(x => nombre[x]);
+    const abierto = abierta === n;
+    const tiene3d = CON_3D.includes(n);
+    const desc = DESCRIPCIONES[n]
+      ? `<p>${DESCRIPCIONES[n]}</p><span class="ejemplo">Texto de ejemplo, a validar por la cátedra</span>`
+      : `<p class="pend">[Descripción breve de la materia, 2 o 3 líneas. A completar por la cátedra.]</p>`;
+    const nota = n.startsWith("Métodos y técnicas") ? `<p class="pend" style="font-size:13px">Optativa si no se toma como Optativa Obligatoria.</p>` : "";
+    return `<div class="mat">
+      <button class="mat-btn" data-n="${esc(n)}" aria-expanded="${abierto}" aria-controls="p${i}">
+        <span><span class="mat-name">${n}</span><span class="mat-otras">${otras.length ? "También optativa en: " + otras.join(", ") : "Optativa solo en esta carrera"}</span></span>
+        <span class="mat-right">${tiene3d ? '<span class="tag3d">3D</span>' : ""}
+          <svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#314766" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+      </button>
+      <div class="panel" id="p${i}" ${abierto ? "" : "hidden"}>
+        <div class="info">${desc}${nota}
+          <div class="datos"><span>Cursada: [cuatrimestre]</span><span>Carga horaria: [hs]</span></div>
+          <a href="#">Ver programa de la materia</a>
+        </div>
+        <div class="media">
+          <div class="video"><button class="play" aria-label="Reproducir video de la cátedra"><svg width="26" height="26" viewBox="0 0 24 24" fill="#314766" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></div>
+          <small>Video de la cátedra, de 30 a 60 segundos (YouTube)</small>
+        </div>
+        ${tiene3d ? `<div class="media">
+          <div class="obj3d" aria-label="Objeto 3D de ejemplo: arrastrá para girar"><div class="cube"><div style="transform:translateZ(42px)"></div><div style="transform:rotateY(180deg) translateZ(42px)"></div><div style="transform:rotateY(90deg) translateZ(42px)"></div><div style="transform:rotateY(-90deg) translateZ(42px)"></div><div style="transform:rotateX(90deg) translateZ(42px);background:rgba(184,86,33,.16)"></div><div style="transform:rotateX(-90deg) translateZ(42px);background:rgba(184,86,33,.16)"></div></div></div>
+          <small>Modelo 3D interactivo: [pieza de la colección del Museo]. Arrastrá para girar.</small>
+        </div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+  if (!filtro) html += `<div class="vacio">[Resto del listado, de «Protección…» en adelante: a completar desde el listado completo de la carrera.]</div>`;
+  $("lista").innerHTML = html;
+  activarCubos();
+}
+
+// Cubo 3D: gira solo y se puede arrastrar
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function activarCubos(){
+  document.querySelectorAll(".obj3d").forEach(box => {
+    const cube = box.querySelector(".cube");
+    let ry = 0, rx = -22, drag = false, px = 0, py = 0;
+    const draw = () => cube.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    box.addEventListener("pointerdown", e => { drag = true; px = e.clientX; py = e.clientY; box.setPointerCapture(e.pointerId); });
+    box.addEventListener("pointermove", e => { if (!drag) return; ry += (e.clientX - px) * .6; rx -= (e.clientY - py) * .6; px = e.clientX; py = e.clientY; draw(); });
+    box.addEventListener("pointerup", () => drag = false);
+    (function loop(){ if (!box.isConnected) return; if (!drag && !reduce) { ry += .4; draw(); } requestAnimationFrame(loop); })();
+  });
+}
+
+$("carreras").addEventListener("click", e => {
+  const b = e.target.closest(".carr"); if (!b) return;
+  sel = b.dataset.id; abierta = null; pintarCarreras(); pintarLista();
+});
+$("lista").addEventListener("click", e => {
+  const b = e.target.closest(".mat-btn"); if (!b) return;
+  const n = b.dataset.n;
+  abierta = abierta === n ? null : n; pintarLista();
+  const again = [...document.querySelectorAll(".mat-btn")].find(x => x.dataset.n === n);
+  if (again) again.focus();
+});
+$("buscar").addEventListener("input", e => { q = e.target.value; abierta = null; pintarLista(); });
+
+pintarCarreras(); pintarLista();
+</script>
+</body>
+</html>
